@@ -20,7 +20,7 @@ add_executable(${PROJECT_NAME}
         main.cpp
         GUI/mainwindow.h
         GUI/mainwindow.cpp
-        Logic/Interfaces/XmlOperation.h.cpp
+        Logic/Interfaces/XmlOperation.h
         Logic/Services/Validation/XmlValidator.cpp
         Logic/Services/Validation/XmlValidator.h
         Logic/Services/Formatting/XmlFormatter.h
