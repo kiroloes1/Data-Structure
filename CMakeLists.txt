@@ -17,7 +17,6 @@ find_package(Qt6 COMPONENTS Widgets REQUIRED)
 # Define your executable and source files
 add_executable(${PROJECT_NAME}
         main.cpp
-        main.cpp
         GUI/mainwindow.h
         GUI/mainwindow.cpp
         Logic/Interfaces/XmlOperation.h
