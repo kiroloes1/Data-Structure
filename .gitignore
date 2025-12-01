@@ -1,0 +1,30 @@
+# --- CLion / JetBrains IDEs ---
+.idea/
+cmake-build-*/
+*.iml
+
+# --- macOS System Files ---
+.DS_Store
+
+# --- CMake Generated Files (Build artifacts) ---
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+*.cbp
+
+# --- Qt Generated Files ---
+# (These are auto-generated during build, do not commit them)
+debug/
+release/
+*.moc
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+*.o
+*.obj
+
+# --- Visual Studio / VS Code (Local settings) ---
+.vscode/
+.vs/
+*.user
