@@ -1,35 +1,28 @@
 #include "mainwindow.h"
-#include <QFileDialog>
-#include <QWidget>
 
-#include "mainwindow.h"
-#include "../Logic/XmlEditorManager.h" // Connects to your Facade
+#include "../Logic/XmlEditorManager.h"
 #include <QFileDialog>
 #include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    // 1. Window Setup
     this->resize(900, 600);
     this->setWindowTitle("XML Editor - CSE331 Team Project");
 
-    // 2. Setup Central Widget & Layouts
     centralWidget = new QWidget(this);
     setCentralWidget(centralWidget);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
-    QHBoxLayout *fileLayout = new QHBoxLayout();      // Top row
-    QHBoxLayout *algoLayout = new QHBoxLayout();      // Middle row
+    QHBoxLayout *fileLayout = new QHBoxLayout();
+    QHBoxLayout *algoLayout = new QHBoxLayout();
 
-    // 3. Create UI Elements
     textEdit = new QTextEdit();
     textEdit->setPlaceholderText("Output will appear here...");
-    textEdit->setReadOnly(true); // Requirement: "Read-only text field"
+    textEdit->setReadOnly(false);
 
     statusLabel = new QLabel("Ready");
 
-    // 4. Create Buttons
     btnBrowse = new QPushButton("📂 Browse");
     btnSave = new QPushButton("💾 Save As");
 
@@ -39,14 +32,12 @@ MainWindow::MainWindow(QWidget *parent)
     btnMini = new QPushButton("Minify");
     btnCompress = new QPushButton("Compress");
     btnDecompress = new QPushButton("Decompress");
+    xmlManager = new XmlEditorManager();
 
-    // 5. Arrange Layouts
-    // -- Top Row (File Ops) --
     fileLayout->addWidget(btnBrowse);
     fileLayout->addWidget(btnSave);
-    fileLayout->addStretch(); // Push buttons to the left
+    fileLayout->addStretch();
 
-    // -- Middle Row (Algorithms) --
     algoLayout->addWidget(btnVerify);
     algoLayout->addWidget(btnFormat);
     algoLayout->addWidget(btnJson);
@@ -54,17 +45,14 @@ MainWindow::MainWindow(QWidget *parent)
     algoLayout->addWidget(btnCompress);
     algoLayout->addWidget(btnDecompress);
 
-    // -- Add to Main Layout --
     mainLayout->addLayout(fileLayout);
     mainLayout->addLayout(algoLayout);
     mainLayout->addWidget(textEdit);
     mainLayout->addWidget(statusLabel);
 
-    // 6. Connect Buttons to Functions
     connect(btnBrowse, &QPushButton::clicked, this, &MainWindow::handleBrowse);
     connect(btnSave, &QPushButton::clicked, this, &MainWindow::handleSave);
 
-    // Connect Algorithm Buttons
     connect(btnVerify, &QPushButton::clicked, this, &MainWindow::handleVerify);
     connect(btnFormat, &QPushButton::clicked, this, &MainWindow::handleFormat);
     connect(btnJson, &QPushButton::clicked, this, &MainWindow::handleJson);
@@ -73,52 +61,94 @@ MainWindow::MainWindow(QWidget *parent)
     connect(btnDecompress, &QPushButton::clicked, this, &MainWindow::handleDecompress);
 }
 
-MainWindow::~MainWindow() {}
+MainWindow::~MainWindow() {
+    delete xmlManager;
+}
 
-// ----------------------
-// File Implementation
-// ----------------------
+
 
 void MainWindow::handleBrowse() {
-    QString fileName = QFileDialog::getOpenFileName(this, "Open XML File", "", "XML Files (*.xml)");
+    QString fileName = QFileDialog::getOpenFileName(this, "Open XML File", "", "XML Files (*.xml);;All Files (*)");
 
     if (!fileName.isEmpty()) {
-        currentFilePath = fileName;
-        statusLabel->setText("Loaded: " + fileName);
+        QFile file(fileName);
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QTextStream in(&file);
+            QString content = in.readAll();
 
-        // Use Manager to read file
-        // XmlEditorManager manager;
-        // std::string content = manager.readFile(fileName.toStdString());
-        // textEdit->setText(QString::fromStdString(content));
+            textEdit->setText(content);
+            currentFilePath = fileName;
+            statusLabel->setText("Loaded: " + fileName);
+            file.close();
+        } else {
+            QMessageBox::warning(this, "Error", "Could not open file!");
+        }
     }
 }
 
 void MainWindow::handleSave() {
-    QString fileName = QFileDialog::getSaveFileName(this, "Save File", "", "Text Files (*.txt);;XML Files (*.xml)");
+    QString fileName = QFileDialog::getSaveFileName(this, "Save File", "", "XML Files (*.xml);;Text Files (*.txt)");
+
     if (fileName.isEmpty()) return;
 
-    // Logic to save the content of textEdit to file
-    // For now, simple placeholder:
-    statusLabel->setText("File Saved (Placeholder)");
+    QFile file(fileName);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        out << textEdit->toPlainText();
+        file.close();
+
+        statusLabel->setText("File Saved: " + fileName);
+        QMessageBox::information(this, "Success", "File saved successfully!");
+    } else {
+        QMessageBox::warning(this, "Error", "Could not save file!");
+    }
 }
 
-// ----------------------
-// Algorithm Implementation
-// ----------------------
+
 
 void MainWindow::handleVerify() {
+    QString qContent = textEdit->toPlainText();
 
+    if (qContent.isEmpty()) {
+        QMessageBox::warning(this, "Warning", "The text area is empty. Please load a file or paste XML first.");
+        return;
+    }
+
+    std::string content = qContent.toStdString();
+    std::string errorLog;
+
+
+    bool isValid = xmlManager->verifyXml(content, errorLog);
+
+    if (isValid) {
+        QMessageBox::information(this, "Verification Result", "✅ The XML file is consistent (Valid).");
+        statusLabel->setText("Status: Valid XML");
+    } else {
+        statusLabel->setText("Status: Invalid XML - Errors Found");
+
+        QString errorMsg = QString("❌ Errors found:\n\n%1").arg(QString::fromStdString(errorLog));
+
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Validation Failed",
+                                      errorMsg + "\n\nDo you want to attempt to fix these errors automatically?",
+                                      QMessageBox::Yes | QMessageBox::No);
+
+        if (reply == QMessageBox::Yes) {
+            std::string fixedContent = xmlManager->fixXml(content);
+
+            textEdit->setText(QString::fromStdString(fixedContent));
+            QMessageBox::information(this, "Success", "The XML has been repaired!");
+            statusLabel->setText("Status: XML Repaired");
+        }
+    }
 }
 
-// --- Placeholders for future tasks ---
 
 void MainWindow::handleFormat() {
-    // Member C will implement this later using manager.format()
     QMessageBox::information(this, "Info", "Format feature coming soon!");
 }
 
 void MainWindow::handleJson() {
-    // Member B will implement this later
     QMessageBox::information(this, "Info", "JSON feature coming soon!");
 }
 

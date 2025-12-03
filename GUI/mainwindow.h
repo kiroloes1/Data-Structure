@@ -8,10 +8,9 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QTextEdit>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QMessageBox>
+#include "../Logic/XmlEditorManager.h"
 
 class MainWindow : public QMainWindow
 {
@@ -35,14 +34,16 @@ private slots:
     void handleDecompress();
 
 private:
-    QString currentFilePath; // Stores the path of the currently open file
+    QString currentFilePath;
 
-    // UI Elements
+    XmlEditorManager *xmlManager;
+
+
     QWidget *centralWidget;
-    QTextEdit *textEdit; // The main display area
-    QLabel *statusLabel; // To show small messages at the bottom
+    QTextEdit *textEdit;
+    QLabel *statusLabel;
 
-    // Buttons
+
     QPushButton *btnBrowse;
     QPushButton *btnSave;
     QPushButton *btnVerify;
@@ -52,5 +53,5 @@ private:
     QPushButton *btnCompress;
     QPushButton *btnDecompress;
 };
-#endif // MAINWINDOW_H
+#endif
 
