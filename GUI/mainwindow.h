@@ -26,7 +26,7 @@ private slots:
     void handleSave();
 
     // Level 1 Algorithms
-    void handleVerify();
+    void handleValidate();
     void handleFormat();
     void handleJson();
     void handleMinify();
@@ -48,7 +48,7 @@ private:
 
     QPushButton *btnBrowse;
     QPushButton *btnSave;
-    QPushButton *btnVerify;
+    QPushButton *btnValidate;
     QPushButton *btnFormat;
     QPushButton *btnJson;
     QPushButton *btnMini;

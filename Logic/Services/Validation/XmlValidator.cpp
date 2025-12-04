@@ -53,7 +53,7 @@ std::vector<Tag> XmlValidator::parseTags(const std::string& xmlContent) {
 }
 
 // ---------------------------------------------------------
-// FUNCTION 1: VALIDATE (Unchanged)
+// FUNCTION 1: VALIDATE
 // ---------------------------------------------------------
 bool XmlValidator::validate(const std::string& xmlContent, std::string& errorLog) {
     std::vector<Tag> tags = parseTags(xmlContent);

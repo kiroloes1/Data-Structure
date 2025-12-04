@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     this->resize(1000, 600);
-    this->setWindowTitle("XML Editor - CSE331 Team Project");
+    this->setWindowTitle("XML Editor");
 
     xmlManager = new XmlEditorManager();
 
@@ -52,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
     btnBrowse = new QPushButton("📂 Browse");
     btnSave = new QPushButton("💾 Save As");
 
-    btnVerify = new QPushButton("Verify");
+    btnValidate = new QPushButton("Validate");
     btnFormat = new QPushButton("Format");
     btnJson = new QPushButton("To JSON");
     btnMini = new QPushButton("Minify");
@@ -63,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
     fileLayout->addWidget(btnSave);
     fileLayout->addStretch();
 
-    algoLayout->addWidget(btnVerify);
+    algoLayout->addWidget(btnValidate);
     algoLayout->addWidget(btnFormat);
     algoLayout->addWidget(btnJson);
     algoLayout->addWidget(btnMini);
@@ -77,7 +77,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(btnBrowse, &QPushButton::clicked, this, &MainWindow::handleBrowse);
     connect(btnSave, &QPushButton::clicked, this, &MainWindow::handleSave);
-    connect(btnVerify, &QPushButton::clicked, this, &MainWindow::handleVerify);
+    connect(btnValidate, &QPushButton::clicked, this, &MainWindow::handleValidate);
     connect(btnFormat, &QPushButton::clicked, this, &MainWindow::handleFormat);
     connect(btnJson, &QPushButton::clicked, this, &MainWindow::handleJson);
     connect(btnMini, &QPushButton::clicked, this, &MainWindow::handleMinify);
@@ -105,7 +105,7 @@ void MainWindow::handleBrowse() {
     }
 }
 
-void MainWindow::handleVerify() {
+void MainWindow::handleValidate() {
     QString qContent = inputTextEdit->toPlainText();
     if (qContent.isEmpty()) {
         QMessageBox::warning(this, "Warning", "The text area is empty. Please load a file or paste XML first.");

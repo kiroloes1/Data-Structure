@@ -3,10 +3,12 @@
 
 #include <string>
 #include "Validation/XmlValidator.h"
+#include "Tree/XmlTree.h"
 
 class XmlEditorManager {
 private:
     XmlValidator validator;
+    XmlTree treeBuilder;
 
 public:
     XmlEditorManager() {
