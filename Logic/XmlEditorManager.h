@@ -4,11 +4,13 @@
 #include <string>
 #include "Validation/XmlValidator.h"
 #include "Tree/XmlTree.h"
+#include "Formatting/XmlFormatter.h"
 
 class XmlEditorManager {
 private:
     XmlValidator validator;
     XmlTree treeBuilder;
+    XmlFormatter formatter;
 
 public:
     XmlEditorManager() {
@@ -20,6 +22,9 @@ public:
 
     std::string fixXml(const std::string& xmlContent) {
         return validator.fix(xmlContent);
+    }
+    std::string formatXml(const std::string& xmlContent) {
+        return formatter.prettify_xml(xmlContent);
     }
 };
 

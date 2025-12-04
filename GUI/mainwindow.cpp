@@ -152,7 +152,18 @@ void MainWindow::handleSave() {
 
 
 void MainWindow::handleFormat() {
-    QMessageBox::information(this, "Info", "Format feature coming soon!");
+    QString qContent = inputTextEdit->toPlainText();
+
+    if (qContent.isEmpty()) {
+        QMessageBox::warning(this, "Warning", "Input is empty. Please type or load XML first.");
+        return;
+    }
+
+    std::string formattedContent = xmlManager->formatXml(qContent.toStdString());
+
+    outputTextEdit->setText(QString::fromStdString(formattedContent));
+
+    statusLabel->setText("Status: XML Formatted successfully");
 }
 
 void MainWindow::handleJson() {
