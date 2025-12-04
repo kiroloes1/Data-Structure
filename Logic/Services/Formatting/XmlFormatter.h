@@ -1,8 +1,13 @@
-//
-// Created by Nouran Atef on 01/12/2025.
-//
+#ifndef XMLFORMATTER_H
+#define XMLFORMATTER_H
 
-#ifndef DATA_STRUCTURE_XMLFORMATTER_H
-#define DATA_STRUCTURE_XMLFORMATTER_H
+#include <string>
+#include <vector>
 
-#endif //DATA_STRUCTURE_XMLFORMATTER_H
+using namespace std;
+
+
+vector<string> tokenize(const string& xml);
+string prettify_xml(const string& xml, const string& indent_unit = "    ");
+
+#endif #include "XmlFormatter.h"
