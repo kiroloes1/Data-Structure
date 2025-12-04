@@ -10,4 +10,4 @@ using namespace std;
 vector<string> tokenize(const string& xml);
 string prettify_xml(const string& xml, const string& indent_unit = "    ");
 
-#endif #include "XmlFormatter.h"
+#endif 
