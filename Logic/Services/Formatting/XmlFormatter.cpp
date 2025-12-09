@@ -2,6 +2,11 @@
 #include <regex>
 
 vector<string> tokenize(const string& xml) {
+#include <iostream>
+
+using namespace std;
+
+vector<string> XmlFormatter::tokenize(const string& xml) {
     vector<string> tokens;
     regex re("<[^>]+>|[^<]+");
     sregex_iterator begin(xml.begin(), xml.end(), re);
@@ -16,6 +21,8 @@ vector<string> tokenize(const string& xml) {
 }
 
 string prettify_xml(const string& xml, const string& indent_unit) {
+string XmlFormatter::prettify_xml(const string& xml) {
+    string indent_unit = "    ";
     vector<string> tokens = tokenize(xml);
     string pretty_xml;
     int indent_level = 0;
@@ -38,6 +45,7 @@ string prettify_xml(const string& xml, const string& indent_unit) {
 
         if (token.substr(0, 2) == "</") {
             indent_level--;
+            if(indent_level > 0) indent_level--;
             pretty_xml += string(indent_level * indent_unit.size(), ' ') + token + "\n";
         }
         else if (token.back() == '/' && token[0] == '<') {
