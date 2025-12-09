@@ -1,5 +1,7 @@
 #include "XmlFormatter.h"
 #include <regex>
+
+vector<string> tokenize(const string& xml) {
 #include <iostream>
 
 using namespace std;
@@ -18,6 +20,7 @@ vector<string> XmlFormatter::tokenize(const string& xml) {
     return tokens;
 }
 
+string prettify_xml(const string& xml, const string& indent_unit) {
 string XmlFormatter::prettify_xml(const string& xml) {
     string indent_unit = "    ";
     vector<string> tokens = tokenize(xml);
@@ -41,6 +44,7 @@ string XmlFormatter::prettify_xml(const string& xml) {
         }
 
         if (token.substr(0, 2) == "</") {
+            indent_level--;
             if(indent_level > 0) indent_level--;
             pretty_xml += string(indent_level * indent_unit.size(), ' ') + token + "\n";
         }
