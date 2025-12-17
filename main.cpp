@@ -2,6 +2,15 @@
 #include "GUI/mainwindow.h"
 #include "CLI/CommandLine.h"
 #include <iostream>
+#include "GUI/mainwindow.h"
+#include <QApplication>
+
+// --- INCLUDE FOR TESTING ---
+#include "Logic/Tree/XmlTree.h"
+#include <iostream>
+#include <string>
+
+
 
 int main(int argc, char *argv[])
 {

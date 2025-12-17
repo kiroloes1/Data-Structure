@@ -36,6 +36,8 @@ add_executable(${PROJECT_NAME}
         CLI/CommandLine.h
         CLI/CommandLine.cpp
 
+        Logic/Tree/XmlTree.cpp
+        Logic/Tree/XmlTree.h
 )
 
 # Link Qt
