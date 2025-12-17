@@ -30,9 +30,12 @@ add_executable(${PROJECT_NAME}
         Logic/Services/Minification/XmlMinifier.cpp
         Logic/Services/Compression/CompressionService.h
         Logic/Services/Compression/CompressionService.cpp
+        Logic/Services/Graph/GraphVisualizer.h
+        Logic/Services/Graph/GraphVisualizer.cpp
         Logic/XmlEditorManager.h
         CLI/CommandLine.h
         CLI/CommandLine.cpp
+
 )
 
 # Link Qt
@@ -41,5 +44,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         GUI
         Logic
         Logic/Services
+        Logic/Services/Graph
         CLI
 )
