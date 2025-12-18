@@ -3,8 +3,16 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "graph.h"
 using namespace std;
 
+
+string trim(const string& str) {
+    size_t first = str.find_first_not_of(" \n\r\t");
+    if (string::npos == first) return str;
+    size_t last = str.find_last_not_of(" \n\r\t");
+    return str.substr(first, (last - first + 1));
+}
 // ------------------------ Graph Class ------------------------
 
 class Graph {
@@ -73,43 +81,75 @@ string extractTag(const string& xml, const string& tag, int& pos) {
     return xml.substr(start, end - start);
 }
 
-void loadXMLtoGraph(const string& filename, Graph& g) {
+void loadXMLtoGraph(const string& filename, Graph& g, 
+                    map<int, string>& idToName, 
+                    map<int, vector<Post>>& idToPosts) {
     string xml = readFile(filename);
     int pos = 0;
 
     while (true) {
+        // --- Find User ---
         int userStart = xml.find("<user>", pos);
         if (userStart == -1) break;
-
         pos = userStart + 6;
 
+        // --- Extract ID ---
         int temp = pos;
         string idStr = extractTag(xml, "id", temp);
         if (idStr == "") continue;
         int userId = stoi(idStr);
 
+        // --- Extract Name (New!) ---
+        temp = pos; // Reset temp to look inside this user
+        string name = extractTag(xml, "name", temp);
+        idToName[userId] = name;
+
+        // --- Extract Posts (New!) ---
+        int postsStart = xml.find("<posts>", pos);
+        int postsEnd = xml.find("</posts>", pos);
+        // Ensure posts belong to THIS user (are before the next user starts)
+        int nextUser = xml.find("<user>", pos);
+        
+        if (postsStart != -1 && postsEnd != -1 && (nextUser == -1 || postsEnd < nextUser)) {
+            int pPos = postsStart;
+            while(true) {
+                int postStart = xml.find("<post>", pPos);
+                if (postStart == -1 || postStart > postsEnd) break;
+                
+                // Extract the raw post content
+                int pTemp = postStart + 6; // skip <post>
+                // Note: logic assumes simple <post>Content</post> or <post><body>...</body></post>
+                // For now, let's just grab the whole body between <post> tags
+                // You might need to refine this if the XML has nested <body > tags
+                string postContent = extractTag(xml, "post", pPos); 
+                
+                // Store it
+                Post newPost;
+                newPost.body = trim(postContent); 
+                // (Optional: Add logic here to find <topic> tags inside postContent if they exist)
+                
+                idToPosts[userId].push_back(newPost);
+            }
+        }
+
+        // --- Extract Followers (Existing Logic) ---
         int followersStart = xml.find("<followers>", pos);
         int followersEnd   = xml.find("</followers>", pos);
 
         if (followersStart != -1 && followersEnd != -1) {
             int fPos = followersStart;
-
             while (true) {
                 int followerStart = xml.find("<follower>", fPos);
-                if (followerStart == -1 || followerStart > followersEnd)
-                    break;
-
+                if (followerStart == -1 || followerStart > followersEnd) break;
                 fPos = followerStart + 10;
-
+                
                 int temp2 = fPos;
                 string followerIdStr = extractTag(xml, "id", temp2);
                 if (followerIdStr != "") {
-                    int followerId = stoi(followerIdStr);
-                    g.add_edge(followerId, userId);
+                    g.add_edge(stoi(followerIdStr), userId);
                 }
             }
         }
-
         pos = followersEnd;
     }
 }
