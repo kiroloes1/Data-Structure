@@ -114,16 +114,4 @@ void loadXMLtoGraph(const string& filename, Graph& g,
     }
 }
 
-// ------------------------ MAIN ------------------------
 
-int main() {
-    Graph g;
-    map<int, string> idToName;
-    map<int, vector<Post>> idToPosts;
-
-    loadXMLtoGraph("input_file.xml", g, idToName, idToPosts);
-
-    g.print_graph();
-
-    return 0;
-}
