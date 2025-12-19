@@ -3,7 +3,9 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <map>
 #include "graph.h"
+#include "graphParser.h"
 using namespace std;
 
 
@@ -116,8 +118,10 @@ void loadXMLtoGraph(const string& filename, Graph& g,
 
 int main() {
     Graph g;
+    map<int, string> idToName;
+    map<int, vector<Post>> idToPosts;
 
-    loadXMLtoGraph("input_file.xml", g);
+    loadXMLtoGraph("input_file.xml", g, idToName, idToPosts);
 
     g.print_graph();
 
