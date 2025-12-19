@@ -13,49 +13,7 @@ string trim(const string& str) {
     size_t last = str.find_last_not_of(" \n\r\t");
     return str.substr(first, (last - first + 1));
 }
-// ------------------------ Graph Class ------------------------
 
-class Graph {
-private:
-    vector<vector<int>> adjList;
-    int maxUserId = 0;
-
-public:
-    Graph(int maxId = 10) {
-        maxUserId = maxId;
-        adjList.resize(maxUserId + 1);
-    }
-
-    void add_vertex(int user_id) {
-        if (user_id > maxUserId) {
-            adjList.resize(user_id + 1);
-            maxUserId = user_id;
-        }
-    }
-
-    void add_edge(int follower_id, int user_id) {
-        add_vertex(follower_id);
-        add_vertex(user_id);
-        adjList[follower_id].push_back(user_id);
-    }
-
-    vector<int> get_neighbors(int user_id) {
-        if (user_id <= maxUserId)
-            return adjList[user_id];
-        return {};
-    }
-
-    void print_graph() {
-        for (int i = 1; i <= maxUserId; i++) {
-            if (!adjList[i].empty()) {
-                cout << "User " << i << " has edges to: ";
-                for (int v : adjList[i])
-                    cout << v << " ";
-                cout << endl;
-            }
-        }
-    }
-};
 
 // ------------------------ XML Parser ------------------------
 
