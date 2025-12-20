@@ -1,67 +1,51 @@
 #include "TopicSearch.h"
-#include "XmlFormatter.h"
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <iostream>
+
 using namespace std;
 
+void searchByTopic(const string& queryTopic, 
+                   const map<int, vector<Post>>& idToPosts,
+                   const map<int, string>& idToName) {
+    
+    bool foundAny = false;
+    cout << "--- Search Results for Topic: '" << queryTopic << "' ---" << endl;
 
-string extractBetween(const string& line,
-                      const string& startTag,
-                      const string& endTag) {
-    size_t start = line.find(startTag);
-    size_t end = line.find(endTag);
-
-    if (start == string::npos || end == string::npos)
-        return "";
-
-    start += startTag.length();
-    return line.substr(start, end - start);
-}
-
-void searchByTopic(const string& topic, const string& inputFile) {
-
-    ifstream file(inputFile);
-    if (!file.is_open()) {
-        cout << "Error: Cannot open XML file.\n";
-        return;
-    }
-
-    string line;
-    bool insidePost = false;
-    bool matched = false;
-    string postData;
-
-    while (getline(file, line)) {
-
-        if (line.find("<post>") != string::npos) {
-            insidePost = true;
-            matched = false;
-            postData.clear();
-        }
-
-        if (insidePost)
-            postData += line + "\n";
-
-        if (line.find("<topic>") != string::npos) {
-            string currentTopic =
-                extractBetween(line, "<topic>", "</topic>");
-
-            if (currentTopic == topic)
-                matched = true;
-        }
-
-        if (line.find("</post>") != string::npos) {
-            if (matched) {
-                cout << "Matched Post:\n";
-                cout << postData << endl;
+    
+    for (auto const& entry : idToPosts) {
+        int userId = entry.first;
+        const vector<Post>& posts = entry.second;
+        
+       
+        for (const Post& post : posts) {
+            
+            bool hasTopic = false;
+            for (const string& t : post.topics) {
+                if (t == queryTopic) { 
+                    hasTopic = true;
+                    break;
+                }
             }
-            insidePost = false;
+
+           
+            if (hasTopic) {
+                foundAny = true;
+                
+                
+                string userName = "Unknown";
+                if (idToName.find(userId) != idToName.end()) {
+                    userName = idToName.at(userId);
+                }
+
+                cout << "User: " << userName << " (ID: " << userId << ")" << endl;
+                cout << "Post Body: " << post.body << endl;
+                cout << "-------------------------" << endl;
+            }
         }
     }
 
-    file.close();
+    if (!foundAny) {
+        cout << "No posts found with the topic: " << queryTopic << endl;
+    }
 }
 
 
