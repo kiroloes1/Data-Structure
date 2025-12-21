@@ -1,8 +1,9 @@
-//
-// Created by Nouran Atef on 01/12/2025.
-//
+#ifndef XML_MINIFIER_H
+#define XML_MINIFIER_H
 
-#ifndef DATA_STRUCTURE_XMLMINIFIER_H
-#define DATA_STRUCTURE_XMLMINIFIER_H
+#include <string>
 
-#endif //DATA_STRUCTURE_XMLMINIFIER_H
+void minifyXML(const std::string& inputFile,
+               const std::string& outputFile);
+
+#endif
