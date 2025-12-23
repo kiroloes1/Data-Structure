@@ -1,0 +1,57 @@
+<users>
+    <user>
+        <id>1</id>
+        <name>Admin</name>
+        <posts>
+            <post><body>Welcome to the XML social network project.</body><topics><topic>intro</topic></topics></post>
+        </posts>
+        <followers>
+            <follower><id>2</id></follower><follower><id>3</id></follower>
+            <follower><id>4</id></follower><follower><id>5</id></follower>
+        </followers>
+    </user>
+    <user>
+        <id>2</id>
+        <name>Expert</name>
+        <posts>
+            <post><body>Byte Pair Encoding is great for data compression.</body><topics><topic>coding</topic></topics></post>
+        </posts>
+        <followers>
+            <follower><id>1</id></follower><follower><id>3</id></follower>
+            <follower><id>6</id></follower><follower><id>7</id></follower>
+            <follower><id>8</id></follower><follower><id>9</id></follower>
+        </followers>
+    </user>
+    <user>
+        <id>3</id>
+        <name>Dev</name>
+        <posts>
+            <post><body>Graphs help us see the mutual followers.</body><topics><topic>math</topic></topics></post>
+        </posts>
+        <followers><follower><id>1</id></follower><follower><id>2</id></follower></followers>
+    </user>
+    <user>
+        <id>4</id>
+        <name>Tester</name>
+        <posts>
+            <post><body>Checking XML consistency using a stack.</body><topics><topic>coding</topic></topics></post>
+        </posts>
+        <followers><follower><id>1</id></follower><follower><id>2</id></follower></followers>
+    </user>
+    <user>
+        <id>5</id>
+        <name>Analyst</name>
+        <posts>
+            <post><body>Analyzing network density is key.</body><topics><topic>data</topic></topics></post>
+        </posts>
+        <followers><follower><id>1</id></follower><follower><id>2</id></follower></followers>
+    </user>
+    <user>
+        <id>6</id><name>User6</name><posts><post><body>Post 6</body><topics><topic>topicA</topic></topics></post></posts>
+        <followers><follower><id>2</id></follower></followers>
+    </user>
+    <user>
+        <id>7</id><name>User7</name><posts><post><body>Post 7</body><topics><topic>topicB</topic></topics></post></posts>
+        <followers><follower><id>2</id></follower></followers>
+    </user>
+</users>
