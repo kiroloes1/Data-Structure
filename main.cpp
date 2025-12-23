@@ -9,8 +9,6 @@
 #include <string>
 
 int main(int argc, char *argv[]) {
-  // Check for explicit GUI request
-  // Usage: ./xml_editor gui
   if (argc > 1 && std::string(argv[1]) == "gui") {
     std::cout << "=== GUI Mode Activated ===" << std::endl;
     QApplication a(argc, argv);
@@ -19,8 +17,7 @@ int main(int argc, char *argv[]) {
     return a.exec();
   }
 
-  // Default: Interactive CLI Mode
-  // If no arguments provided, start REPL loop.
+
   if (argc == 1) {
     CommandLine::runInteractive();
     return 0;
