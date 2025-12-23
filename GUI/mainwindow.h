@@ -37,8 +37,8 @@ private:
   QString currentFilePath;
 
   XmlEditorManager *xmlManager;
-  QTextEdit *inputTextEdit;  // The editable left side
-  QTextEdit *outputTextEdit; // The read-only right side
+  QTextEdit *inputTextEdit;
+  QTextEdit *outputTextEdit;
 
   QWidget *centralWidget;
   QTextEdit *textEdit;
@@ -53,7 +53,6 @@ private:
   QPushButton *btnCompress;
   QPushButton *btnDecompress;
 
-  // Level 2
   QPushButton *btnDraw;
 };
 

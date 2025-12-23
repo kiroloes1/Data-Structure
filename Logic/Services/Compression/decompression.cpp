@@ -1,9 +1,9 @@
 #include "decompression.h"
 
+#include <cctype>
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
-#include <cctype>
 
 using namespace std;
 
@@ -13,24 +13,24 @@ using namespace std;
  * Reads an entire file into a single string.
  * Uses stringstream to efficiently load all contents.
  */
-static string readFile(const string& path) {
-    ifstream in(path);
-    if (!in) {
-        return "";
-    }
+static string readFile(const string &path) {
+  ifstream in(path);
+  if (!in) {
+    return "";
+  }
 
-    stringstream buffer;
-    buffer << in.rdbuf();   // Copy entire file into buffer
-    return buffer.str();
+  stringstream buffer;
+  buffer << in.rdbuf(); // Copy entire file into buffer
+  return buffer.str();
 }
 
 /*
  * decompressText
  * ----------------
  * Core logic of decompression.
- * 
+ *
  * Expected compressed file format:
- * 
+ *
  *      N
  *      @1=<tag1>
  *      @2=<tag2>
@@ -47,76 +47,102 @@ static string readFile(const string& path) {
  *  5. Expand occurrences of @codes back to original XML tags
  *
  */
-string decompressText(const string& compressedText) {
-    stringstream in(compressedText);
-    string line;
+string decompressText(const string &compressedText) {
+  stringstream in(compressedText);
+  string line;
 
-    // (1) Read dictionary size
-    if (!getline(in, line)) return "";
-    int N = stoi(line);
+  // (1) Read dictionary size
+  if (!getline(in, line))
+    return "";
 
-    // (2) Read dictionary:
-    //     store @codes and their matching XML tags
-    unordered_map<string, string> dict;
-    for (int i = 0; i < N; i++) {
-        if (!getline(in, line)) return "";
+  int N = 0;
+  try {
+    N = stoi(line);
+  } catch (...) {
+    // If line is not a number (e.g. user passed raw XML instead of compressed
+    // format)
+    return ""; // Fail gracefully
+  }
 
-        // dictionary entry format: @X=<xml>
-        size_t pos = line.find('=');
-        if (pos == string::npos) continue;
+  // (2) Read dictionary:
+  //     store @codes and their matching XML tags
+  unordered_map<string, string> dict;
+  for (int i = 0; i < N; i++) {
+    if (!getline(in, line))
+      return "";
 
-        string code  = line.substr(0, pos);       // "@1"
-        string value = line.substr(pos + 1);      // "<user>"
+    // dictionary entry format: @X=<xml>
+    size_t pos = line.find('=');
+    if (pos == string::npos)
+      continue;
 
-        dict[code] = value;
+    string code = line.substr(0, pos);   // "@1"
+    string value = line.substr(pos + 1); // "<user>"
+
+    dict[code] = value;
+  }
+
+  // (3) Read separator line ('---')
+  getline(in, line);
+
+  // (4) Read remaining lines as compressed body
+  string compressedBody, tmp;
+  bool firstLine = true;
+  while (getline(in, tmp)) {
+    if (!firstLine)
+      compressedBody += "\n";
+    compressedBody += tmp;
+    firstLine = false;
+  }
+
+  // (5) Decode compressed body
+  string result;
+
+  for (size_t i = 0; i < compressedBody.size();) {
+    // Case A: Normal character, copy as-is
+    if (compressedBody[i] != '@') {
+      result += compressedBody[i];
+      i++;
     }
+    // Case B: Found '@'
+    else {
+      // Check for escaped '@' (i.e., "@@")
+      if (i + 1 < compressedBody.size() && compressedBody[i + 1] == '@') {
+        result += '@';
+        i += 2; // Skip both '@' characters
+        continue;
+      }
 
-    // (3) Read separator line ('---')
-    getline(in, line);
+      size_t j = i + 1;
 
-    // (4) Read remaining lines as compressed body
-    string compressedBody, tmp;
-    bool firstLine = true;
-    while (getline(in, tmp)) {
-        if (!firstLine) compressedBody += "\n";
-        compressedBody += tmp;
-        firstLine = false;
-    }
+      // Consume digits after '@'
+      while (j < compressedBody.size() && isdigit(compressedBody[j])) {
+        j++;
+      }
 
-    // (5) Decode compressed body
-    string result;
+      // We expect a semicolon ';' as terminator
+      if (j < compressedBody.size() && compressedBody[j] == ';') {
+        j++; // Consume the semicolon
 
-    for (size_t i = 0; i < compressedBody.size(); ) {
-        // Case A: Normal character, copy as-is
-        if (compressedBody[i] != '@') {
-            result += compressedBody[i];
-            i++;
+        string code = compressedBody.substr(i, j - i);
+
+        if (dict.count(code)) {
+          result += dict[code];
+        } else {
+          // Should not happen for valid files, but safe fallback
+          result += code;
         }
-        // Case B: Found '@' → must read @ + digits
-        else {
-            size_t j = i + 1;
+      } else {
+        // No semicolon found? Treat as literal text (or legacy format fallback)
+        // But since we escape '@', this shouldn't happen for valid tokens.
+        result += compressedBody.substr(i, j - i);
+      }
 
-            // Consume digits after '@'
-            while (j < compressedBody.size() && isdigit(compressedBody[j])) {
-                j++;
-            }
-
-            // Extract "@X" substring
-            string code = compressedBody.substr(i, j - i);
-
-            // Replace with original tag if exists
-            if (dict.count(code)) {
-                result += dict[code];
-            } else {
-                // Unknown code (should not happen) → leave as-is
-                result += code;
-            }
-
-            i = j;   // Move index past the code
-        }
+      i = j;
     }
+  }
 
-    return result;
+  return result;
 }
 
 /*
@@ -124,26 +150,26 @@ string decompressText(const string& compressedText) {
  * ----------------
  * Reads compressed file from disk, processes it, and writes the XML output.
  */
-bool decompressFile(const string& inputPath, const string& outputPath) {
-    // Load entire compressed file
-    string compressedText = readFile(inputPath);
-    if (compressedText.empty()) {
-        return false;
-    }
+bool decompressFile(const string &inputPath, const string &outputPath) {
+  // Load entire compressed file
+  string compressedText = readFile(inputPath);
+  if (compressedText.empty()) {
+    return false;
+  }
 
-    // Perform decompression
-    string xml = decompressText(compressedText);
-    if (xml.empty()) {
-        return false;
-    }
+  // Perform decompression
+  string xml = decompressText(compressedText);
+  if (xml.empty()) {
+    return false;
+  }
 
-    // Write output XML to file
-    ofstream out(outputPath);
-    if (!out) {
-        return false;
-    }
+  // Write output XML to file
+  ofstream out(outputPath);
+  if (!out) {
+    return false;
+  }
 
-    out << xml;
-    out.close();
-    return true;
+  out << xml;
+  out.close();
+  return true;
 }
