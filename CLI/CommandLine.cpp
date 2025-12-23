@@ -127,6 +127,7 @@ void CommandLine::printUsage() {
   std::cout << "XML Editor CLI" << std::endl;
   std::cout << "Usage: xml_editor <action> [options]\n" << std::endl;
   std::cout << "Actions:" << std::endl;
+  std::cout << "  gui              Launch Graphical Interface" << std::endl;
   std::cout << "  verify           Check XML consistency (use -f to fix)"
             << std::endl;
   std::cout << "  format           Prettify XML indentation" << std::endl;
@@ -166,6 +167,14 @@ std::string readFileContent(const std::string &path) {
 // ---------------------------------------------------------
 // IMPLEMENTATIONS
 // ---------------------------------------------------------
+
+int CommandLine::handleGuiCommand() {
+  std::cout << "Launching GUI..." << std::endl;
+  // Use system call to restart application in GUI mode
+  // This avoids QApplication lifecycle issues within the REPL loop
+  int result = system("./xml_editor gui");
+  return result;
+}
 
 int CommandLine::handleDrawCommand() {
   std::string inputFile = getOption("-i");
@@ -301,7 +310,7 @@ int CommandLine::handleConvertCommand() {
   std::cout << "JSON saved to " << outputFile << std::endl;
 
   // Clean up if needed (Node destructor handles children)
-  delete root;
+  // delete root; // Removed: XmlTree destructor already manages this memory.
   return 0;
 }
 
@@ -490,6 +499,8 @@ int CommandLine::execute() {
     return 0;
   }
 
+  if (command == "gui")
+    return handleGuiCommand();
   if (command == "draw")
     return handleDrawCommand();
   if (command == "verify")

@@ -30,6 +30,7 @@ private:
   void parseInternal(const std::vector<std::string> &rawArgs);
 
   // Command handlers
+  int handleGuiCommand();
   int handleDrawCommand();
   int handleValidateCommand();
   int handleFormatCommand();

@@ -58,7 +58,6 @@ private:
   QPushButton *btnCompress;
   QPushButton *btnDecompress;
 
-  // Level 2
   QPushButton *btnDraw;
   QPushButton *btnMostInfluencer;
   QPushButton *btnMostActive;
