@@ -1,7 +1,7 @@
 <users>
     <user>
         <id>1</id>
-        <name>Admin</name>
+        <name>User1</name>
         <posts>
             <post><body>Welcome to the XML social network project.</body><topics><topic>intro</topic></topics></post>
         </posts>
@@ -12,7 +12,7 @@
     </user>
     <user>
         <id>2</id>
-        <name>Expert</name>
+        <name>User2</name>
         <posts>
             <post><body>Byte Pair Encoding is great for data compression.</body><topics><topic>coding</topic></topics></post>
         </posts>
@@ -23,7 +23,7 @@
     </user>
     <user>
         <id>3</id>
-        <name>Dev</name>
+        <name>User3</name>
         <posts>
             <post><body>Graphs help us see the mutual followers.</body><topics><topic>math</topic></topics></post>
         </posts>
@@ -31,7 +31,7 @@
     </user>
     <user>
         <id>4</id>
-        <name>Tester</name>
+        <name>User4</name>
         <posts>
             <post><body>Checking XML consistency using a stack.</body><topics><topic>coding</topic></topics></post>
         </posts>
@@ -39,7 +39,7 @@
     </user>
     <user>
         <id>5</id>
-        <name>Analyst</name>
+        <name>User5</name>
         <posts>
             <post><body>Analyzing network density is key.</body><topics><topic>data</topic></topics></post>
         </posts>
