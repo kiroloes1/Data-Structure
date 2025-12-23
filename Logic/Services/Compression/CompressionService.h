@@ -1,8 +1,8 @@
-//
-// Created by Nouran Atef on 01/12/2025.
-//
+#ifndef COMPRESSION_SERVICE_H
+#define COMPRESSION_SERVICE_H
 
-#ifndef DATA_STRUCTURE_COMPRESSIONSERVICE_H
-#define DATA_STRUCTURE_COMPRESSIONSERVICE_H
+#include <string>
 
-#endif //DATA_STRUCTURE_COMPRESSIONSERVICE_H
+void compressXML(const std::string &inputFile, const std::string &outputFile);
+
+#endif

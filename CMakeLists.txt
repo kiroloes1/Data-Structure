@@ -24,17 +24,25 @@ add_executable(${PROJECT_NAME}
         Logic/Services/Validation/XmlValidator.h
         Logic/Services/Formatting/XmlFormatter.h
         Logic/Services/Formatting/XmlFormatter.cpp
-        Logic/Services/JSON/JsonConverter.h
-        Logic/Services/JSON/JsonConverter.cpp
+        Logic/JSON/JsonConverter.h
+        Logic/JSON/JsonConverter.cpp
         Logic/Services/Minification/XmlMinifier.h
         Logic/Services/Minification/XmlMinifier.cpp
         Logic/Services/Compression/CompressionService.h
         Logic/Services/Compression/CompressionService.cpp
+        Logic/Services/Compression/decompression.cpp
         Logic/Services/Graph/GraphVisualizer.h
         Logic/Services/Graph/GraphVisualizer.cpp
         Logic/XmlEditorManager.h
         CLI/CommandLine.h
         CLI/CommandLine.cpp
+        
+        Logic/Graph/graphParser.cpp
+        Logic/Analysis/mostInfluencerId.cpp
+        Logic/Analysis/most_active.cpp
+        Logic/Analysis/mutualFollowers.cpp
+        Logic/Analysis/SuggestionEngine.cpp
+        Logic/Analysis/TopicSearch.cpp
 
         Logic/Tree/XmlTree.cpp
         Logic/Tree/XmlTree.h
@@ -47,5 +55,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
         Logic
         Logic/Services
         Logic/Services/Graph
+        Logic/Graph
+        Logic/Analysis
         CLI
 )

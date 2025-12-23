@@ -5,55 +5,56 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "../Logic/XmlEditorManager.h"
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QTextEdit>
-#include <QHBoxLayout>
-#include <QLabel>
-#include "../Logic/XmlEditorManager.h"
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+class MainWindow : public QMainWindow {
+  Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+  MainWindow(QWidget *parent = nullptr);
+  ~MainWindow();
 
 private slots:
-    // File Operations
-    void handleBrowse();
-    void handleSave();
+  // File Operations
+  void handleBrowse();
+  void handleSave();
 
-    // Level 1 Algorithms
-    void handleValidate();
-    void handleFormat();
-    void handleJson();
-    void handleMinify();
-    void handleCompress();
-    void handleDecompress();
+  // Level 1 Algorithms
+  void handleValidate();
+  void handleFormat();
+  void handleJson();
+  void handleMinify();
+  void handleCompress();
+  void handleDecompress();
+  void handleDrawGraph();
 
 private:
-    QString currentFilePath;
+  QString currentFilePath;
 
-    XmlEditorManager *xmlManager;
-    QTextEdit *inputTextEdit;  // The editable left side
-    QTextEdit *outputTextEdit; // The read-only right side
+  XmlEditorManager *xmlManager;
+  QTextEdit *inputTextEdit;  // The editable left side
+  QTextEdit *outputTextEdit; // The read-only right side
 
+  QWidget *centralWidget;
+  QTextEdit *textEdit;
+  QLabel *statusLabel;
 
-    QWidget *centralWidget;
-    QTextEdit *textEdit;
-    QLabel *statusLabel;
+  QPushButton *btnBrowse;
+  QPushButton *btnSave;
+  QPushButton *btnValidate;
+  QPushButton *btnFormat;
+  QPushButton *btnJson;
+  QPushButton *btnMini;
+  QPushButton *btnCompress;
+  QPushButton *btnDecompress;
 
-
-    QPushButton *btnBrowse;
-    QPushButton *btnSave;
-    QPushButton *btnValidate;
-    QPushButton *btnFormat;
-    QPushButton *btnJson;
-    QPushButton *btnMini;
-    QPushButton *btnCompress;
-    QPushButton *btnDecompress;
+  // Level 2
+  QPushButton *btnDraw;
 };
-#endif
 
+#endif
