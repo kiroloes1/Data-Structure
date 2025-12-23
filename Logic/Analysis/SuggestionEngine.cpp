@@ -9,26 +9,35 @@ using namespace std;
 // =========================================================
 vector<int> suggest_users(int user_id, Graph &network) {
 
-  vector<int> direct_friends = network.get_neighbors(user_id);
+  // Step 1: Get followers of the current user
+  vector<int> my_followers = network.get_followers(user_id);
 
-  if (direct_friends.empty()) {
+  if (my_followers.empty()) {
     return {};
   }
 
   set<int> excluded_users;
+  // Exclude self
   excluded_users.insert(user_id);
 
-  for (int friend_id : direct_friends) {
-    excluded_users.insert(friend_id);
+  vector<int> already_following = network.get_neighbors(user_id);
+  for (int following_id : already_following) {
+    excluded_users.insert(following_id);
   }
+
+  // Also exclude my direct followers from suggestions?
+  // Usually reciprocal following is good, but strictly "followers of followers"
+  // means we look at the next hop. Let's keep them as valid suggestions unless
+  // already followed.
 
   set<int> suggestions_set;
 
-  for (int middle_man : direct_friends) {
+  for (int follower_id : my_followers) {
 
-    vector<int> friends_of_friend = network.get_neighbors(middle_man);
+    // Step 2: Get followers of my followers
+    vector<int> followers_of_follower = network.get_followers(follower_id);
 
-    for (int candidate_id : friends_of_friend) {
+    for (int candidate_id : followers_of_follower) {
 
       if (excluded_users.count(candidate_id) == 0) {
         suggestions_set.insert(candidate_id);
