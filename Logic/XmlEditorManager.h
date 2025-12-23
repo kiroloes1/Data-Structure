@@ -117,9 +117,16 @@ public:
     if (!loadGraph(xmlContent, g, names, posts))
       return "Error loading graph.";
 
-    std::pair<int, std::string> active = most_active_user(g, names);
-    return "Most Active User: " + active.second +
-           " (ID: " + std::to_string(active.first) + ")";
+    std::vector<int> activeUsers = most_active_user(g);
+    if (activeUsers.empty())
+      return "No active users found.";
+
+    std::string result = "Most Active User(s):";
+    for (int id : activeUsers) {
+      std::string name = (names.count(id) ? names[id] : "Unknown");
+      result += "\n- " + name + " (ID: " + std::to_string(id) + ")";
+    }
+    return result;
   }
 
   std::string getMutualFollowers(const std::string &xmlContent,

@@ -375,9 +375,18 @@ int CommandLine::handleMostActiveCommand() {
   if (!loadGraphHelper(inputFile, g, names, posts))
     return 1;
 
-  std::pair<int, std::string> active = most_active_user(g, names);
-  std::cout << "Most Active User: " << active.second << " (ID: " << active.first
-            << ")" << std::endl;
+  std::vector<int> activeUsers = most_active_user(g);
+
+  if (activeUsers.empty()) {
+    std::cout << "No active users found." << std::endl;
+    return 0;
+  }
+
+  std::cout << "Most Active User(s):" << std::endl;
+  for (int id : activeUsers) {
+    std::string name = (names.count(id) ? names[id] : "Unknown");
+    std::cout << "- " << name << " (ID: " << id << ")" << std::endl;
+  }
   return 0;
 }
 

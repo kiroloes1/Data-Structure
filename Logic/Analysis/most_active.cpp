@@ -3,25 +3,28 @@
 
 using namespace std;
 
-pair<int, string> most_active_user(Graph &g, map<int, string> &idToName) {
-
+std::vector<int> most_active_user(Graph &g) {
   int maxFollowers = -1;
-  int mostActiveId = -1;
-
+  std::vector<int> activeUsers;
   int maxId = g.get_max_user_id();
 
   for (int user = 1; user <= maxId; user++) {
     // "Most Active" = Who follows the most people (Out-Degree)
     std::vector<int> follows = g.get_neighbors(user);
-    int followingCount = follows.size();
+    int followingCount = (int)follows.size();
 
     if (followingCount > maxFollowers) {
       maxFollowers = followingCount;
-      mostActiveId = user;
+      activeUsers.clear();
+      activeUsers.push_back(user);
+    } else if (followingCount == maxFollowers) {
+      activeUsers.push_back(user);
     }
   }
 
-  return {mostActiveId, idToName[mostActiveId]};
+  if (maxFollowers == 0)
+    return {};
+  return activeUsers;
 }
 
 // #include <iostream>

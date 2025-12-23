@@ -5,7 +5,6 @@
 #include <map>
 #include <utility>
 
-std::pair<int, std::string>
-most_active_user(Graph &g, std::map<int, std::string> &idToName);
+std::vector<int> most_active_user(Graph &g);
 
 #endif
