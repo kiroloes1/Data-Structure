@@ -56,6 +56,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   btnCompress = new QPushButton("Compress");
   btnDecompress = new QPushButton("Decompress");
 
+  btnDraw = new QPushButton("Draw Graph");
+  btnMostInfluencer = new QPushButton("Most Influencer");
+  btnMostActive = new QPushButton("Most Active");
+  btnMutual = new QPushButton("Mutual");
+  btnSuggest = new QPushButton("Suggest");
+  btnSearch = new QPushButton("Search");
+
   fileLayout->addWidget(btnBrowse);
   fileLayout->addWidget(btnSave);
   fileLayout->addStretch();
@@ -67,9 +74,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   algoLayout->addWidget(btnCompress);
   algoLayout->addWidget(btnDecompress);
 
+  // New row for Analysis
+  QHBoxLayout *analysisLayout = new QHBoxLayout();
+  analysisLayout->addWidget(btnDraw);
+  analysisLayout->addWidget(btnMostInfluencer);
+  analysisLayout->addWidget(btnMostActive);
+  analysisLayout->addWidget(btnMutual);
+  analysisLayout->addWidget(btnSuggest);
+  analysisLayout->addWidget(btnSearch);
+
   mainLayout->addLayout(fileLayout);
   mainLayout->addWidget(splitter);
   mainLayout->addLayout(algoLayout);
+  mainLayout->addLayout(analysisLayout);
   mainLayout->addWidget(statusLabel);
 
   connect(btnBrowse, &QPushButton::clicked, this, &MainWindow::handleBrowse);
@@ -83,6 +100,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
           &MainWindow::handleCompress);
   connect(btnDecompress, &QPushButton::clicked, this,
           &MainWindow::handleDecompress);
+
+  connect(btnDraw, &QPushButton::clicked, this, &MainWindow::handleDrawGraph);
+  connect(btnMostInfluencer, &QPushButton::clicked, this,
+          &MainWindow::handleMostInfluencer);
+  connect(btnMostActive, &QPushButton::clicked, this,
+          &MainWindow::handleMostActive);
+  connect(btnMutual, &QPushButton::clicked, this, &MainWindow::handleMutual);
+  connect(btnSuggest, &QPushButton::clicked, this, &MainWindow::handleSuggest);
+  connect(btnSearch, &QPushButton::clicked, this, &MainWindow::handleSearch);
 }
 
 MainWindow::~MainWindow() { delete xmlManager; }
@@ -305,4 +331,73 @@ void MainWindow::handleDrawGraph() {
   } else {
     QMessageBox::critical(this, "Error", "Failed to draw graph.");
   }
+}
+
+void MainWindow::handleMostInfluencer() {
+  std::string content = inputTextEdit->toPlainText().toStdString();
+  if (content.empty())
+    return;
+
+  std::string result = xmlManager->getMostInfluencer(content);
+  outputTextEdit->setText(QString::fromStdString(result));
+  statusLabel->setText("Status: Most Influencer Found");
+}
+
+void MainWindow::handleMostActive() {
+  std::string content = inputTextEdit->toPlainText().toStdString();
+  if (content.empty())
+    return;
+
+  std::string result = xmlManager->getMostActive(content);
+  outputTextEdit->setText(QString::fromStdString(result));
+  statusLabel->setText("Status: Most Active User Found");
+}
+
+#include <QInputDialog>
+void MainWindow::handleMutual() {
+  std::string content = inputTextEdit->toPlainText().toStdString();
+  if (content.empty())
+    return;
+
+  QString idsStr = QInputDialog::getText(this, "Mutual Followers",
+                                         "Enter User IDs (comma separated):");
+  if (idsStr.isEmpty())
+    return;
+
+  std::vector<int> ids;
+  QStringList parts = idsStr.split(",");
+  for (const QString &p : parts) {
+    if (!p.trimmed().isEmpty())
+      ids.push_back(p.trimmed().toInt());
+  }
+
+  std::string result = xmlManager->getMutualFollowers(content, ids);
+  outputTextEdit->setText(QString::fromStdString(result));
+  statusLabel->setText("Status: Mutual Followers Found");
+}
+
+void MainWindow::handleSuggest() {
+  std::string content = inputTextEdit->toPlainText().toStdString();
+  if (content.empty())
+    return;
+
+  int id = QInputDialog::getInt(this, "Suggest Users", "Enter User ID:");
+
+  std::string result = xmlManager->getSuggestions(content, id);
+  outputTextEdit->setText(QString::fromStdString(result));
+  statusLabel->setText("Status: Suggestions Generated");
+}
+
+void MainWindow::handleSearch() {
+  std::string content = inputTextEdit->toPlainText().toStdString();
+  if (content.empty())
+    return;
+
+  QString query = QInputDialog::getText(this, "Search", "Enter Word or Topic:");
+  if (query.isEmpty())
+    return;
+
+  std::string result = xmlManager->searchPost(content, query.toStdString());
+  outputTextEdit->setText(QString::fromStdString(result));
+  statusLabel->setText("Status: Search Completed");
 }

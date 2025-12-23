@@ -32,6 +32,11 @@ private slots:
   void handleCompress();
   void handleDecompress();
   void handleDrawGraph();
+  void handleMostInfluencer();
+  void handleMostActive();
+  void handleMutual();
+  void handleSuggest();
+  void handleSearch();
 
 private:
   QString currentFilePath;
@@ -53,7 +58,13 @@ private:
   QPushButton *btnCompress;
   QPushButton *btnDecompress;
 
+  // Level 2
   QPushButton *btnDraw;
+  QPushButton *btnMostInfluencer;
+  QPushButton *btnMostActive;
+  QPushButton *btnMutual;
+  QPushButton *btnSuggest;
+  QPushButton *btnSearch;
 };
 
 #endif
