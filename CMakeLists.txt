@@ -46,7 +46,11 @@ add_executable(${PROJECT_NAME}
 
         Logic/Tree/XmlTree.cpp
         Logic/Tree/XmlTree.h
+        Logic/Tree/XmlTree.h
 )
+
+# Rename the output executable to xml_editor
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "xml_editor")
 
 # Link Qt
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)

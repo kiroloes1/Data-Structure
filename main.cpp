@@ -1,40 +1,32 @@
-#include <QApplication>
-#include "GUI/mainwindow.h"
 #include "CLI/CommandLine.h"
-#include <iostream>
 #include "GUI/mainwindow.h"
 #include <QApplication>
+#include <iostream>
 
 // --- INCLUDE FOR TESTING ---
 #include "Logic/Tree/XmlTree.h"
 #include <iostream>
 #include <string>
 
+int main(int argc, char *argv[]) {
+  // Check for explicit GUI request
+  // Usage: ./xml_editor gui
+  if (argc > 1 && std::string(argv[1]) == "gui") {
+    std::cout << "=== GUI Mode Activated ===" << std::endl;
+    QApplication a(argc, argv);
+    MainWindow w;
+    w.show();
+    return a.exec();
+  }
 
+  // Default: Interactive CLI Mode
+  // If no arguments provided, start REPL loop.
+  if (argc == 1) {
+    CommandLine::runInteractive();
+    return 0;
+  }
 
-int main(int argc, char *argv[])
-{
-    // Check if running in CLI mode (has command line arguments)
-    if (argc > 1) {
-        // CLI Mode
-        std::cout << "=== CLI Mode Activated ===" << std::endl;
-        std::cout << "Arguments: " << argc << std::endl;
-        for (int i = 0; i < argc; i++) {
-            std::cout << "  argv[" << i << "]: " << argv[i] << std::endl;
-        }
-        std::cout << std::endl;
-
-        CommandLine cli(argc, argv);
-        int result = cli.execute();
-
-        std::cout << "=== CLI Execution Complete (exit code: " << result << ") ===" << std::endl;
-        return result;
-    } else {
-        // GUI Mode
-        std::cout << "=== GUI Mode ===" << std::endl;
-        QApplication a(argc, argv);
-        MainWindow w;
-        w.show();
-        return a.exec();
-    }
+  std::cout << "=== CLI Single Command Mode ===" << std::endl;
+  CommandLine cli(argc, argv);
+  return cli.execute();
 }

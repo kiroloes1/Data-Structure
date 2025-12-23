@@ -172,6 +172,8 @@ public:
     std::streambuf *old = std::cout.rdbuf(buffer.rdbuf());
 
     searchByTopic(query, posts, names);
+    std::cout << "\n";
+    searchByWord(query, posts, names);
 
     std::cout.rdbuf(old);
     return buffer.str();

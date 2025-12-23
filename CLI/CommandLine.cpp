@@ -19,22 +19,30 @@
 #include <iostream>
 #include <sstream>
 
-CommandLine::CommandLine(int argc, char *argv[]) { parseArguments(argc, argv); }
+CommandLine::CommandLine(int argc, char *argv[]) {
+  std::vector<std::string> argsVec;
+  for (int i = 0; i < argc; i++)
+    argsVec.push_back(argv[i]);
+  parseInternal(argsVec);
+}
 
-void CommandLine::parseArguments(int argc, char *argv[]) {
-  if (argc > 0) {
-    // Just command name
-    programName = "xml_editor";
+CommandLine::CommandLine(const std::vector<std::string> &argsInput) {
+  parseInternal(argsInput);
+}
+
+void CommandLine::parseInternal(const std::vector<std::string> &rawArgs) {
+  if (rawArgs.size() > 0) {
+    programName = rawArgs[0];
   }
 
   // Parse command and options
-  for (int i = 1; i < argc; i++) {
-    std::string arg = argv[i];
+  for (size_t i = 1; i < rawArgs.size(); i++) {
+    std::string arg = rawArgs[i];
 
     if (arg[0] == '-') {
       // It's an option (e.g. -i, -o, -f, -w, -t)
-      if (i + 1 < argc && argv[i + 1][0] != '-') {
-        options[arg] = argv[i + 1];
+      if (i + 1 < rawArgs.size() && rawArgs[i + 1][0] != '-') {
+        options[arg] = rawArgs[i + 1];
         i++; // Skip next argument as it is the value
       } else {
         options[arg] = "true"; // Boolean flag
@@ -43,8 +51,56 @@ void CommandLine::parseArguments(int argc, char *argv[]) {
       // It's the main command (e.g. verify, compress)
       if (args.empty())
         args.push_back(arg);
-      // If we have multiple loose arguments (like mutual ids), handle ad-hoc if
-      // needed
+    }
+  }
+}
+
+void CommandLine::runInteractive() {
+  std::cout << "==========================================" << std::endl;
+  std::cout << "      XML Editor Interactive Shell        " << std::endl;
+  std::cout << "==========================================" << std::endl;
+  std::cout << "Type commands just like in CLI mode (without './xml_editor')."
+            << std::endl;
+  std::cout << "Example: verify -i sample.xml" << std::endl;
+  std::cout << "Type 'exit' or 'quit' to close." << std::endl;
+  std::cout << "==========================================" << std::endl;
+
+  while (true) {
+    std::cout << "\nXML> ";
+    std::string line;
+    if (!std::getline(std::cin, line))
+      break;
+
+    if (line == "exit" || line == "quit")
+      break;
+    if (line.empty())
+      continue;
+
+    // Tokenize line respecting quotes could be complex.
+    // For simplicity, let's split by space.
+    // Improvement: Handle quotes later if needed.
+    std::vector<std::string> tokens;
+    tokens.push_back("xml_editor"); // Dummy program name (argv[0])
+
+    std::stringstream ss(line);
+    std::string token;
+    bool firstToken = true;
+    while (ss >> token) {
+      // If user types "xml_editor verify ..." or "./xml_editor verify ..." in
+      // shell, we should ignore the "xml_editor" part so the command becomes
+      // "verify".
+      if (firstToken && (token == "xml_editor" || token == "./xml_editor")) {
+        firstToken = false;
+        continue;
+      }
+      tokens.push_back(token);
+      firstToken = false;
+    }
+
+    // Attempt execution if we have a command
+    if (tokens.size() > 1) {
+      CommandLine cli(tokens);
+      cli.execute();
     }
   }
 }
@@ -421,17 +477,7 @@ int CommandLine::handleSearchCommand() {
   if (!topic.empty()) {
     searchByTopic(topic, posts, names);
   } else {
-    // Assume word search is similar or same logic?
-    // Requirement mentions "search text". If separate function needed, use it.
-    // For now, mapping topic search (user said "post search" for word OR
-    // topic). If Logic/TopicSearch.h covers generic search, use it. Actually,
-    // let's assume searchByTopic only checks topics. We might need to implement
-    // a word search in Posts bodies. BUT logic file is named `TopicSearch.cpp`.
-    // Let's rely on it for now or check if it supports body search.
-    std::cout << "Word search not fully implemented in backend, trying Topic "
-                 "Search logic..."
-              << std::endl;
-    searchByTopic(word, posts, names);
+    searchByWord(word, posts, names);
   }
   return 0;
 }

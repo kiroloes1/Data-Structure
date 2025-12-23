@@ -11,11 +11,13 @@ private:
   std::vector<std::string> args;
   std::map<std::string, std::string> options;
 
-  void parseArguments(int argc, char *argv[]);
   void printUsage();
 
 public:
   CommandLine(int argc, char *argv[]);
+  CommandLine(const std::vector<std::string> &args);
+
+  static void runInteractive();
 
   bool hasOption(const std::string &option);
   std::string getOption(const std::string &option);
@@ -23,6 +25,9 @@ public:
 
   // Execute the command
   int execute();
+
+private:
+  void parseInternal(const std::vector<std::string> &rawArgs);
 
   // Command handlers
   int handleDrawCommand();
