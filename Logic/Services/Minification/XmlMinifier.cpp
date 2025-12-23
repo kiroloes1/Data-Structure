@@ -1,11 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cctype>
+#include "XmlMinifier.h"
 
 using namespace std;
 
 // Function to minify XML, remove comments, and trim spaces in text nodes
-void minifyXML(string inputFile, string outputFile) {
+//void minifyXML(string inputFile, string outputFile) {
+void minifyXML(const string& inputFile, const string& outputFile) {
     ifstream input(inputFile);
     ofstream output(outputFile);
 
@@ -93,24 +96,24 @@ void minifyXML(string inputFile, string outputFile) {
 }
 
 // Main function for command-line arguments
-int main(int argc, char* argv[]) {
-    if (argc < 6) {
-        cout << "Usage: xml_editor mini -i input_file.xml -o output_file.xml" << endl;
-        return 1;
-    }
+//int main(int argc, char* argv[]) {
+//    if (argc < 6) {
+//        cout << "Usage: xml_editor mini -i input_file.xml -o output_file.xml" << endl;
+//        return 1;
+ //   }
 
-    string mode = argv[1];
-    string inputOption = argv[2];
-    string inputFile = argv[3];
-    string outputOption = argv[4];
-    string outputFile = argv[5];
+//    string mode = argv[1];
+//    string inputOption = argv[2];
+//    string inputFile = argv[3];
+//    string outputOption = argv[4];
+//    string outputFile = argv[5];
 
-    if (mode == "mini" && inputOption == "-i" && outputOption == "-o") {
-        minifyXML(inputFile, outputFile);
-    } else {
-        cout << "Invalid command! Use: xml_editor mini -i input_file.xml -o output_file.xml" << endl;
-        return 1;
-    }
+//    if (mode == "mini" && inputOption == "-i" && outputOption == "-o") {
+//        minifyXML(inputFile, outputFile);
+//    } else {
+//        cout << "Invalid command! Use: xml_editor mini -i input_file.xml -o output_file.xml" << endl;
+//        return 1;
+//    }
 
-    return 0;
-}
+//    return 0;
+//}
