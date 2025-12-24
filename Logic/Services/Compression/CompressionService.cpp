@@ -9,7 +9,7 @@
 using namespace std;
 
 static string readFile(const string &path) {
-  ifstream in(path);
+  ifstream in(path, ios::binary);
   if (!in)
     return "";
   stringstream buffer;
@@ -17,11 +17,23 @@ static string readFile(const string &path) {
   return buffer.str();
 }
 
+// NEW: helper to get file size
+static long long getFileSize(const string &path) {
+  ifstream in(path, ios::binary | ios::ate);
+  if (!in)
+    return 0;
+  return in.tellg();
+}
+
 bool isTagNameChar(char c) {
   return isalnum(c) || c == '_' || c == '-' || c == ':';
 }
 
 void compressXML(const string &inputFile, const string &outputFile) {
+
+  // NEW: original file size
+  long long originalSize = getFileSize(inputFile);
+
   string content = readFile(inputFile);
   if (content.empty()) {
     cerr << "Error: Input file is empty or cannot be opened." << endl;
@@ -41,8 +53,6 @@ void compressXML(const string &inputFile, const string &outputFile) {
       if (j < content.length()) {
         string potentialTag = content.substr(i, j - i + 1);
 
-        // Only compress tags that don't contain newlines (to preserve
-        // dictionary format)
         if (potentialTag.find('\n') == string::npos) {
           if (tagToCode.find(potentialTag) == tagToCode.end()) {
             string code = "@" + to_string(counter++) + ";";
@@ -74,8 +84,6 @@ void compressXML(const string &inputFile, const string &outputFile) {
         compressedBody << content[i];
       }
     } else {
-      // Escape literal '@' to '@@' to avoid confusion with codes during
-      // decompression
       if (content[i] == '@') {
         compressedBody << "@@";
       } else {
@@ -84,7 +92,7 @@ void compressXML(const string &inputFile, const string &outputFile) {
     }
   }
 
-  ofstream out(outputFile);
+  ofstream out(outputFile, ios::binary);
   if (!out) {
     cerr << "Error: Cannot open output file." << endl;
     return;
@@ -98,9 +106,23 @@ void compressXML(const string &inputFile, const string &outputFile) {
   }
 
   out << "---" << endl;
-
   out << compressedBody.str();
 
   out.close();
-  cout << "Compression completed. Saved to " << outputFile << endl;
+
+  //  compressed file size
+  long long compressedSize = getFileSize(outputFile);
+
+  // compression percentage
+  if (originalSize > 0) {
+    double compressionPercent =
+        (1.0 - (double)compressedSize / originalSize) * 100.0;
+
+    cout << "Compression completed. Saved to " << outputFile << endl;
+    cout << "Original size    : " << originalSize << " bytes" << endl;
+    cout << "Compressed size  : " << compressedSize << " bytes" << endl;
+    cout << "Compression ratio: " << compressionPercent << " %" << endl;
+  } else {
+    cout << "Compression completed. Saved to " << outputFile << endl;
+  }
 }

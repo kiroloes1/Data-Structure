@@ -59,9 +59,8 @@ string decompressText(const string &compressedText) {
   try {
     N = stoi(line);
   } catch (...) {
-    // If line is not a number (e.g. user passed raw XML instead of compressed
-    // format)
-    return ""; // Fail gracefully
+
+    return "";
   }
 
   // (2) Read dictionary:
