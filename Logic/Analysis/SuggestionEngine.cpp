@@ -25,10 +25,6 @@ vector<int> suggest_users(int user_id, Graph &network) {
     excluded_users.insert(following_id);
   }
 
-  // Also exclude my direct followers from suggestions?
-  // Usually reciprocal following is good, but strictly "followers of followers"
-  // means we look at the next hop. Let's keep them as valid suggestions unless
-  // already followed.
 
   set<int> suggestions_set;
 
