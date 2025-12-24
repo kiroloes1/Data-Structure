@@ -49,8 +49,8 @@ add_executable(${PROJECT_NAME}
         Logic/Tree/XmlTree.h
 )
 
-# Rename the output executable to xml_editor
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "xml_editor")
+# Rename the output executable to xml_verify
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "xml_verify")
 
 # Link Qt
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Widgets)

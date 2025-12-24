@@ -6,9 +6,23 @@ using namespace std;
 
 string indent(int level) { return string(level * 4, ' '); }
 
+// Helper to trim whitespace
+string jsonTrim(const string &str) {
+  size_t first = str.find_first_not_of(" \t\n\r");
+  if (string::npos == first)
+    return "";
+  size_t last = str.find_last_not_of(" \t\n\r");
+  // Debug print
+  // cout << "Trimming: [" << str << "] to [" << str.substr(first, (last - first
+  // + 1)) << "]" << endl;
+  return str.substr(first, (last - first + 1));
+}
+
 string nodeToJSONBody(Node *node, int level) {
   if (node->children.empty()) {
-    return "\"" + node->textBody + "\"";
+    // Basic JSON string escaping could be added here if needed, but for now
+    // just trim
+    return "\"" + jsonTrim(node->textBody) + "\"";
   }
 
   string json = "{\n";

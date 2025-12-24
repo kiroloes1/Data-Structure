@@ -35,20 +35,26 @@ void CommandLine::parseInternal(const std::vector<std::string> &rawArgs) {
     programName = rawArgs[0];
   }
 
-  // Parse command and options
   for (size_t i = 1; i < rawArgs.size(); i++) {
     std::string arg = rawArgs[i];
 
     if (arg[0] == '-') {
-      // It's an option (e.g. -i, -o, -f, -w, -t)
-      if (i + 1 < rawArgs.size() && rawArgs[i + 1][0] != '-') {
-        options[arg] = rawArgs[i + 1];
-        i++; // Skip next argument as it is the value
+      // Options that REQUIRE a value
+      if (arg == "-i" || arg == "-o" || arg == "-w" || arg == "-t" ||
+          arg == "-id" || arg == "-ids") {
+        if (i + 1 < rawArgs.size() && rawArgs[i + 1][0] != '-') {
+          options[arg] = rawArgs[i + 1];
+          i++;
+        } else {
+          // Argument missing its value, treat as empty or error?
+          // For now, let's just not set it to "true" to avoid "saved to true"
+          options[arg] = "";
+        }
       } else {
-        options[arg] = "true"; // Boolean flag
+        // Boolean flags (like -f)
+        options[arg] = "true.xml";
       }
     } else {
-      // It's the main command (e.g. verify, compress)
       if (args.empty())
         args.push_back(arg);
     }
@@ -59,8 +65,7 @@ void CommandLine::runInteractive() {
   std::cout << "==========================================" << std::endl;
   std::cout << "      XML Editor Interactive Shell        " << std::endl;
   std::cout << "==========================================" << std::endl;
-  std::cout << "Type commands just like in CLI mode (without './xml_editor')."
-            << std::endl;
+  std::cout << "Type commands just like in CLI mode." << std::endl;
   std::cout << "Example: verify -i sample.xml" << std::endl;
   std::cout << "Type 'exit' or 'quit' to close." << std::endl;
   std::cout << "==========================================" << std::endl;
@@ -76,20 +81,14 @@ void CommandLine::runInteractive() {
     if (line.empty())
       continue;
 
-    // Tokenize line respecting quotes could be complex.
-    // For simplicity, let's split by space.
-    // Improvement: Handle quotes later if needed.
     std::vector<std::string> tokens;
-    tokens.push_back("xml_editor"); // Dummy program name (argv[0])
+    tokens.push_back("xml_verify");
 
     std::stringstream ss(line);
     std::string token;
     bool firstToken = true;
     while (ss >> token) {
-      // If user types "xml_editor verify ..." or "./xml_editor verify ..." in
-      // shell, we should ignore the "xml_editor" part so the command becomes
-      // "verify".
-      if (firstToken && (token == "xml_editor" || token == "./xml_editor")) {
+      if (firstToken && (token == "xml_verify" || token == "./xml_verify")) {
         firstToken = false;
         continue;
       }
@@ -97,7 +96,6 @@ void CommandLine::runInteractive() {
       firstToken = false;
     }
 
-    // Attempt execution if we have a command
     if (tokens.size() > 1) {
       CommandLine cli(tokens);
       cli.execute();
@@ -125,7 +123,7 @@ std::string CommandLine::getCommand() {
 
 void CommandLine::printUsage() {
   std::cout << "XML Editor CLI" << std::endl;
-  std::cout << "Usage: xml_editor <action> [options]\n" << std::endl;
+  std::cout << "Usage: xml_verify <action> [options]\n" << std::endl;
   std::cout << "Actions:" << std::endl;
   std::cout << "  gui              Launch Graphical Interface" << std::endl;
   std::cout << "  verify           Check XML consistency (use -f to fix)"
@@ -170,9 +168,7 @@ std::string readFileContent(const std::string &path) {
 
 int CommandLine::handleGuiCommand() {
   std::cout << "Launching GUI..." << std::endl;
-  // Use system call to restart application in GUI mode
-  // This avoids QApplication lifecycle issues within the REPL loop
-  int result = system("./xml_editor gui");
+  int result = system("./xml_verify gui");
   return result;
 }
 
@@ -181,7 +177,7 @@ int CommandLine::handleDrawCommand() {
   std::string outputFile = getOption("-o");
 
   if (inputFile.empty() || outputFile.empty()) {
-    std::cerr << "Usage: xml_editor draw -i input.xml -o output.jpg"
+    std::cerr << "Usage: xml_verify draw -i input.xml -o output.jpg"
               << std::endl;
     return 1;
   }
@@ -195,13 +191,12 @@ int CommandLine::handleDrawCommand() {
 }
 
 int CommandLine::handleValidateCommand() {
-  // verify -i input.xml [-f] [-o output.xml]
   std::string inputFile = getOption("-i");
   bool fix = hasOption("-f");
   std::string outputFile = getOption("-o");
 
   if (inputFile.empty()) {
-    std::cerr << "Usage: xml_editor verify -i input.xml [-f -o output.xml]"
+    std::cerr << "Usage: xml_verify verify -i input.xml [-f -o output.xml]"
               << std::endl;
     return 1;
   }
@@ -220,7 +215,15 @@ int CommandLine::handleValidateCommand() {
     std::cout << "valid" << std::endl;
     return 0;
   } else {
+    long errorCount = 0;
+    if (!errors.empty()) {
+      errorCount = std::count(errors.begin(), errors.end(), '\n');
+      if (errors.back() != '\n')
+        errorCount++;
+    }
+
     std::cout << "invalid" << std::endl;
+    std::cout << errorCount << " errors found:" << std::endl;
     std::cout << errors << std::endl;
 
     if (fix) {
@@ -244,7 +247,7 @@ int CommandLine::handleFormatCommand() {
   std::string outputFile = getOption("-o");
 
   if (inputFile.empty() || outputFile.empty()) {
-    std::cerr << "Usage: xml_editor format -i input.xml -o output.xml"
+    std::cerr << "Usage: xml_verify format -i input.xml -o output.xml"
               << std::endl;
     return 1;
   }
@@ -272,7 +275,7 @@ int CommandLine::handleMinifyCommand() {
   std::string outputFile = getOption("-o");
 
   if (inputFile.empty() || outputFile.empty()) {
-    std::cerr << "Usage: xml_editor mini -i input.xml -o output.xml"
+    std::cerr << "Usage: xml_verify mini -i input.xml -o output.xml"
               << std::endl;
     return 1;
   }
@@ -287,7 +290,7 @@ int CommandLine::handleConvertCommand() {
   std::string outputFile = getOption("-o");
 
   if (inputFile.empty() || outputFile.empty()) {
-    std::cerr << "Usage: xml_editor json -i input.xml -o output.json"
+    std::cerr << "Usage: xml_verify json -i input.xml -o output.json"
               << std::endl;
     return 1;
   }
@@ -309,8 +312,6 @@ int CommandLine::handleConvertCommand() {
   out.close();
   std::cout << "JSON saved to " << outputFile << std::endl;
 
-  // Clean up if needed (Node destructor handles children)
-  // delete root; // Removed: XmlTree destructor already manages this memory.
   return 0;
 }
 
@@ -319,7 +320,7 @@ int CommandLine::handleCompressCommand() {
   std::string outputFile = getOption("-o");
 
   if (inputFile.empty() || outputFile.empty()) {
-    std::cerr << "Usage: xml_editor compress -i input.xml -o output.comp"
+    std::cerr << "Usage: xml_verify compress -i input.xml -o output.comp"
               << std::endl;
     return 1;
   }
@@ -333,7 +334,7 @@ int CommandLine::handleDecompressCommand() {
   std::string outputFile = getOption("-o");
 
   if (inputFile.empty() || outputFile.empty()) {
-    std::cerr << "Usage: xml_editor decompress -i input.comp -o output.xml"
+    std::cerr << "Usage: xml_verify decompress -i input.comp -o output.xml"
               << std::endl;
     return 1;
   }
@@ -406,7 +407,7 @@ int CommandLine::handleMutualCommand() {
   std::string inputFile = getOption("-i");
   std::string idsStr = getOption("-ids");
   if (idsStr.empty()) {
-    std::cerr << "Usage: xml_editor mutual -i input.xml -ids 1,2,3"
+    std::cerr << "Usage: xml_verify mutual -i input.xml -ids 1,2,3"
               << std::endl;
     return 1;
   }
@@ -425,7 +426,6 @@ int CommandLine::handleMutualCommand() {
       userIds.push_back(std::stoi(segment));
   }
 
-  // Functional API call
   std::set<int> mutualsSet = get_mutual_followers(g, userIds);
   std::vector<int> mutuals(mutualsSet.begin(), mutualsSet.end());
 
@@ -448,7 +448,7 @@ int CommandLine::handleSuggestCommand() {
   std::string inputFile = getOption("-i");
   std::string idStr = getOption("-id");
   if (idStr.empty()) {
-    std::cerr << "Usage: xml_editor suggest -i input.xml -id 1" << std::endl;
+    std::cerr << "Usage: xml_verify suggest -i input.xml -id 1" << std::endl;
     return 1;
   }
   int userId = std::stoi(idStr);
@@ -459,7 +459,6 @@ int CommandLine::handleSuggestCommand() {
   if (!loadGraphHelper(inputFile, g, names, posts))
     return 1;
 
-  // Functional API call
   std::vector<int> suggestions = suggest_users(userId, g);
 
   if (suggestions.empty())
@@ -481,7 +480,7 @@ int CommandLine::handleSearchCommand() {
   std::string topic = getOption("-t");
 
   if (inputFile.empty() || (word.empty() && topic.empty())) {
-    std::cerr << "Usage: xml_editor search -i input.xml -w word OR -t topic"
+    std::cerr << "Usage: xml_verify search -i input.xml -w word OR -t topic"
               << std::endl;
     return 1;
   }

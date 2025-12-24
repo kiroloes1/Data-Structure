@@ -67,7 +67,7 @@ std::vector<int> most_active_user(Graph &g) {
 //    map<int, string> idToName;
 //    map<int, vector<Post>> idToPosts;
 
-//    loadXMLtoGraph("input_file.xml", g, idToName, idToPosts);
+//    loadXMLtoGraph("input_file.xml.xml", g, idToName, idToPosts);
 
 //    int mostActiveId = findMostActiveUser(g);
 
